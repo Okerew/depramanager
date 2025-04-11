@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as cp from "child_process";
 import * as https from "https";
-import { exec } from 'child_process';
+import { exec } from "child_process";
 
 interface VersionInfo {
   current: string;
@@ -44,7 +44,10 @@ interface LanguageConfig {
     dep: string,
     version: string
   ) => Promise<Vulnerability[]>;
-  getSubDependencies: (dep: string, version: string) => Promise<Map<string, string>>;
+  getSubDependencies: (
+    dep: string,
+    version: string
+  ) => Promise<Map<string, string>>;
 }
 
 interface DependencyAnalysis {
@@ -170,11 +173,18 @@ const languageConfigs: LanguageConfig[] = [
         return [];
       }
     },
-    getSubDependencies: async (dep: string, version: string): Promise<Map<string, string>> => {
+    getSubDependencies: async (
+      dep: string,
+      version: string
+    ): Promise<Map<string, string>> => {
       try {
-        const response = await fetch(`https://pypi.org/pypi/${dep}/${version}/json`);
+        const response = await fetch(
+          `https://pypi.org/pypi/${dep}/${version}/json`
+        );
         if (!response.ok) {
-          throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
+          throw new Error(
+            `Failed to fetch data: ${response.status} ${response.statusText}`
+          );
         }
 
         const data = await response.json();
@@ -186,7 +196,7 @@ const languageConfigs: LanguageConfig[] = [
           const match = req.match(/^([^(]+)(?:\s*\((.*?)\))?/);
           if (match) {
             const [, name, version = "latest"] = match;
-            subDeps.set(name.trim(), version.replace(/[>=<~^]/g, '').trim());
+            subDeps.set(name.trim(), version.replace(/[>=<~^]/g, "").trim());
           }
         }
 
@@ -307,19 +317,26 @@ const languageConfigs: LanguageConfig[] = [
         return [];
       }
     },
-    getSubDependencies: async (dep: string, version: string): Promise<Map<string, string>> => {
+    getSubDependencies: async (
+      dep: string,
+      version: string
+    ): Promise<Map<string, string>> => {
       try {
-        const response = await fetch(`https://registry.npmjs.org/${dep}/${version}`);
+        const response = await fetch(
+          `https://registry.npmjs.org/${dep}/${version}`
+        );
         if (!response.ok) {
-          throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
+          throw new Error(
+            `Failed to fetch data: ${response.status} ${response.statusText}`
+          );
         }
 
         const data = await response.json();
         const subDeps = new Map<string, string>();
-        
+
         if (data.dependencies) {
           Object.entries(data.dependencies).forEach(([name, version]) => {
-            subDeps.set(name, (version as string).replace(/[>=<~^]/g, ''));
+            subDeps.set(name, (version as string).replace(/[>=<~^]/g, ""));
           });
         }
 
@@ -441,22 +458,29 @@ const languageConfigs: LanguageConfig[] = [
         return [];
       }
     },
-    getSubDependencies: async (dep: string, version: string): Promise<Map<string, string>> => {
+    getSubDependencies: async (
+      dep: string,
+      version: string
+    ): Promise<Map<string, string>> => {
       try {
-        const response = await fetch(`https://proxy.golang.org/${dep}/@v/${version}.info`);
+        const response = await fetch(
+          `https://proxy.golang.org/${dep}/@v/${version}.info`
+        );
         if (!response.ok) {
-          throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
+          throw new Error(
+            `Failed to fetch data: ${response.status} ${response.statusText}`
+          );
         }
-    
+
         const data = await response.json();
         const subDeps = new Map<string, string>();
-        
+
         if (data.Deps) {
           data.Deps.forEach((dep: any) => {
             subDeps.set(dep.Path, dep.Version);
           });
         }
-    
+
         return subDeps;
       } catch (error) {
         console.error(`Error fetching sub-dependencies for ${dep}:`, error);
@@ -572,22 +596,29 @@ const languageConfigs: LanguageConfig[] = [
         return [];
       }
     },
-    getSubDependencies: async (dep: string, version: string): Promise<Map<string, string>> => {
+    getSubDependencies: async (
+      dep: string,
+      version: string
+    ): Promise<Map<string, string>> => {
       try {
-        const response = await fetch(`https://crates.io/api/v1/crates/${dep}/${version}`);
+        const response = await fetch(
+          `https://crates.io/api/v1/crates/${dep}/${version}`
+        );
         if (!response.ok) {
-          throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
+          throw new Error(
+            `Failed to fetch data: ${response.status} ${response.statusText}`
+          );
         }
-    
+
         const data = await response.json();
         const subDeps = new Map<string, string>();
-        
+
         if (data.dependencies) {
           data.dependencies.forEach((dep: any) => {
             subDeps.set(dep.name, dep.req);
           });
         }
-    
+
         return subDeps;
       } catch (error) {
         console.error(`Error fetching sub-dependencies for ${dep}:`, error);
@@ -738,22 +769,29 @@ const languageConfigs: LanguageConfig[] = [
         return [];
       }
     },
-    getSubDependencies: async (dep: string, version: string): Promise<Map<string, string>> => {
+    getSubDependencies: async (
+      dep: string,
+      version: string
+    ): Promise<Map<string, string>> => {
       try {
-        const response = await fetch(`https://packagist.org/packages/${dep}/json`);
+        const response = await fetch(
+          `https://packagist.org/packages/${dep}/json`
+        );
         if (!response.ok) {
-          throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
+          throw new Error(
+            `Failed to fetch data: ${response.status} ${response.statusText}`
+          );
         }
-    
+
         const data = await response.json();
         const subDeps = new Map<string, string>();
-        
+
         if (data.package.dependencies) {
           data.package.dependencies.forEach((dep: any) => {
             subDeps.set(dep.name, dep.version);
           });
         }
-    
+
         return subDeps;
       } catch (error) {
         console.error(`Error fetching sub-dependencies for ${dep}:`, error);
@@ -776,6 +814,11 @@ interface DependencyQuickPickItem extends vscode.QuickPickItem {
   dependency: DependencyInfo;
 }
 
+interface ImportAnalysisResult {
+  detectedImports: Set<string>;
+  missingImports: string[];
+  language: string;
+}
 
 class DependencyAnalyzer {
   private async findFiles(
@@ -899,7 +942,7 @@ class DependencyAnalyzer {
       return {
         name: dep,
         version: version,
-        dependencies: new Map()
+        dependencies: new Map(),
       };
     }
 
@@ -917,7 +960,7 @@ class DependencyAnalyzer {
     return {
       name: dep,
       version: version,
-      dependencies
+      dependencies,
     };
   }
 
@@ -926,11 +969,14 @@ class DependencyAnalyzer {
     config: LanguageConfig
   ): Promise<Map<string, DependencyNode>> {
     const depTree = new Map<string, DependencyNode>();
-    const workspaceFiles = await this.findFiles(workspacePath, config.dependencyFiles);
+    const workspaceFiles = await this.findFiles(
+      workspacePath,
+      config.dependencyFiles
+    );
 
     for (const file of workspaceFiles) {
       try {
-        const content = fs.readFileSync(file, 'utf-8');
+        const content = fs.readFileSync(file, "utf-8");
         const deps = config.parser(content);
 
         for (const dep of deps) {
@@ -1403,94 +1449,108 @@ class DependencyAnalyzer {
   }
   async uninstallSpecificDependency(folderPath: string): Promise<void> {
     // First, let user select the language with proper typing
-    const languageQuickPick = await vscode.window.showQuickPick<LanguageQuickPickItem>(
-      languageConfigs.map(config => ({
-        label: config.name,
-        description: `Uninstall ${config.name} dependencies`,
-        config: config
-      })),
-      {
-        placeHolder: 'Select the language/framework',
-        matchOnDescription: true,
-        matchOnDetail: true
-      }
-    );
-  
+    const languageQuickPick =
+      await vscode.window.showQuickPick<LanguageQuickPickItem>(
+        languageConfigs.map((config) => ({
+          label: config.name,
+          description: `Uninstall ${config.name} dependencies`,
+          config: config,
+        })),
+        {
+          placeHolder: "Select the language/framework",
+          matchOnDescription: true,
+          matchOnDetail: true,
+        }
+      );
+
     if (!languageQuickPick) {
       return;
     }
-  
+
     const config = languageQuickPick.config;
-  
+
     try {
       // Get installed dependencies for the selected language
-      const installedDeps = await this.getInstalledDependencies(folderPath, config);
-      
+      const installedDeps = await this.getInstalledDependencies(
+        folderPath,
+        config
+      );
+
       if (!installedDeps || installedDeps.length === 0) {
-        vscode.window.showInformationMessage(`No ${config.name} dependencies found to uninstall.`);
+        vscode.window.showInformationMessage(
+          `No ${config.name} dependencies found to uninstall.`
+        );
         return;
       }
-  
+
       // Let user select dependencies to uninstall with proper typing
-      const depToUninstall = await vscode.window.showQuickPick<DependencyQuickPickItem>(
-        installedDeps.map(dep => ({
-          label: dep.name,
-          description: dep.version ? `Current version: ${dep.version}` : undefined,
-          dependency: dep
-        })),
-        {
-          placeHolder: 'Select dependency to uninstall',
-          matchOnDescription: true,
-          matchOnDetail: true
-        }
-      );
-  
+      const depToUninstall =
+        await vscode.window.showQuickPick<DependencyQuickPickItem>(
+          installedDeps.map((dep) => ({
+            label: dep.name,
+            description: dep.version
+              ? `Current version: ${dep.version}`
+              : undefined,
+            dependency: dep,
+          })),
+          {
+            placeHolder: "Select dependency to uninstall",
+            matchOnDescription: true,
+            matchOnDetail: true,
+          }
+        );
+
       if (!depToUninstall) {
         return;
       }
-  
+
       // Execute uninstall command based on language
-      const terminal = vscode.window.createTerminal(`Uninstall ${depToUninstall.dependency.name}`);
-      
+      const terminal = vscode.window.createTerminal(
+        `Uninstall ${depToUninstall.dependency.name}`
+      );
+
       let uninstallCommand: string;
       switch (config.name.toLowerCase()) {
-        case 'python':
+        case "python":
           uninstallCommand = `pip uninstall ${depToUninstall.dependency.name} -y`;
           break;
-        case 'php':
+        case "php":
           uninstallCommand = `composer remove ${depToUninstall.dependency.name}`;
           break;
-        case 'javascript':
-        case 'nodejs':
-          const hasYarnLock = fs.existsSync(path.join(folderPath, 'yarn.lock'));
-          uninstallCommand = hasYarnLock 
+        case "javascript":
+        case "nodejs":
+          const hasYarnLock = fs.existsSync(path.join(folderPath, "yarn.lock"));
+          uninstallCommand = hasYarnLock
             ? `yarn remove ${depToUninstall.dependency.name}`
             : `npm uninstall ${depToUninstall.dependency.name}`;
           break;
-        case 'rust':
+        case "rust":
           vscode.window.showInformationMessage(
             `For Rust projects, please remove the dependency "${depToUninstall.dependency.name}" from your Cargo.toml file and run "cargo build" to update dependencies.`
           );
           return;
-        case 'go':
+        case "go":
           uninstallCommand = `go mod edit -droprequire=${depToUninstall.dependency.name} && go mod tidy`;
           break;
         default:
-          vscode.window.showErrorMessage(`Uninstall command not implemented for ${config.name}`);
+          vscode.window.showErrorMessage(
+            `Uninstall command not implemented for ${config.name}`
+          );
           return;
       }
-  
+
       terminal.sendText(`cd "${folderPath}"`);
       terminal.sendText(uninstallCommand);
       terminal.show();
-  
+
       vscode.window.showInformationMessage(
         `Uninstalling ${depToUninstall.dependency.name}... Check the terminal for progress.`
       );
-  
     } catch (error) {
       vscode.window.showErrorMessage(
-        `Error uninstalling dependency: ${error instanceof Error ? error.message : String(error)}`
+        `Error uninstalling dependency: ${
+          error instanceof Error ? error.message : String(error)
+        }`
       );
     }
   }
@@ -1506,84 +1566,467 @@ class DependencyAnalyzer {
       });
     });
   }
-  
+
   private async getInstalledDependencies(
-    folderPath: string, 
+    folderPath: string,
     config: LanguageConfig
   ): Promise<DependencyInfo[]> {
     switch (config.name.toLowerCase()) {
-      case 'python':
-        const pipList = await this.execCommand('pip list --format=json', folderPath);
+      case "python":
+        const pipList = await this.execCommand(
+          "pip list --format=json",
+          folderPath
+        );
         return JSON.parse(pipList).map((dep: any) => ({
           name: dep.name,
-          version: dep.version
+          version: dep.version,
         }));
-      
-      case 'php':
+
+      case "php":
         const composerJson = JSON.parse(
           await fs.promises.readFile(
-            path.join(folderPath, 'composer.json'),
-            'utf8'
+            path.join(folderPath, "composer.json"),
+            "utf8"
           )
         );
         return [
-          ...Object.keys(composerJson.require || {}).map(name => ({
+          ...Object.keys(composerJson.require || {}).map((name) => ({
             name,
-            version: composerJson.require[name]
+            version: composerJson.require[name],
           })),
-          ...Object.keys(composerJson['require-dev'] || {}).map(name => ({
+          ...Object.keys(composerJson["require-dev"] || {}).map((name) => ({
             name,
-            version: composerJson['require-dev'][name]
-          }))
+            version: composerJson["require-dev"][name],
+          })),
         ];
-      
-      case 'javascript':
-      case 'nodejs':
+
+      case "javascript":
+      case "nodejs":
         const packageJson = JSON.parse(
           await fs.promises.readFile(
-            path.join(folderPath, 'package.json'),
-            'utf8'
+            path.join(folderPath, "package.json"),
+            "utf8"
           )
         );
         return [
-          ...Object.keys(packageJson.dependencies || {}).map(name => ({
+          ...Object.keys(packageJson.dependencies || {}).map((name) => ({
             name,
-            version: packageJson.dependencies[name]
+            version: packageJson.dependencies[name],
           })),
-          ...Object.keys(packageJson.devDependencies || {}).map(name => ({
+          ...Object.keys(packageJson.devDependencies || {}).map((name) => ({
             name,
-            version: packageJson.devDependencies[name]
-          }))
+            version: packageJson.devDependencies[name],
+          })),
         ];
-      
-      case 'rust':
+
+      case "rust":
         const cargoToml = await fs.promises.readFile(
-          path.join(folderPath, 'Cargo.toml'),
-          'utf8'
+          path.join(folderPath, "Cargo.toml"),
+          "utf8"
         );
-        const dependencies = cargoToml.match(/^\[dependencies\]([\s\S]*?)(\[|$)/m);
+        const dependencies = cargoToml.match(
+          /^\[dependencies\]([\s\S]*?)(\[|$)/m
+        );
         if (!dependencies) return [];
-        
+
         return dependencies[1]
-          .split('\n')
-          .filter(line => line.trim() && !line.trim().startsWith('#'))
-          .map(line => {
-            const [name, version] = line.split('=').map(s => s.trim());
-            return { name, version: version?.replace(/['"]/g, '') };
+          .split("\n")
+          .filter((line) => line.trim() && !line.trim().startsWith("#"))
+          .map((line) => {
+            const [name, version] = line.split("=").map((s) => s.trim());
+            return { name, version: version?.replace(/['"]/g, "") };
           });
-      
-      case 'go':
-        const modList = await this.execCommand('go list -m all', folderPath);
+
+      case "go":
+        const modList = await this.execCommand("go list -m all", folderPath);
         return modList
-          .split('\n')
-          .filter(line => line && !line.startsWith('go '))
-          .map(line => {
-            const [name, version] = line.split(' ');
+          .split("\n")
+          .filter((line) => line && !line.startsWith("go "))
+          .map((line) => {
+            const [name, version] = line.split(" ");
             return { name, version };
           });
-      
+
       default:
         return [];
+    }
+  }
+
+  async analyzeCurrentFileImports(): Promise<ImportAnalysisResult | null> {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+      vscode.window.showInformationMessage("No file is currently open");
+      return null;
+    }
+
+    const document = editor.document;
+    const fileContent = document.getText();
+    const fileExtension = path.extname(document.fileName).toLowerCase();
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+
+    if (!workspaceFolders) {
+      vscode.window.showErrorMessage("No workspace folder found!");
+      return null;
+    }
+
+    const workspacePath = workspaceFolders[0].uri.fsPath;
+
+    // Determine the language based on file extension
+    const language = this.getLanguageFromExtension(fileExtension);
+    if (!language) {
+      vscode.window.showInformationMessage(
+        `Unsupported file type: ${fileExtension}`
+      );
+      return null;
+    }
+
+    // Extract imports from the file
+    const detectedImports = this.extractImportsFromFile(fileContent, language);
+
+    // Find the corresponding language config
+    const config = languageConfigs.find(
+      (c) => c.name.toLowerCase() === language.toLowerCase()
+    );
+    if (!config) {
+      return null;
+    }
+
+    // Get installed dependencies
+    const installed = new Set(config.getInstalledDeps(workspacePath));
+
+    // Find missing imports
+    const missingImports = [...detectedImports].filter(
+      (importName) =>
+        !installed.has(this.normalizeImportName(importName, language))
+    );
+
+    return {
+      detectedImports,
+      missingImports,
+      language,
+    };
+  }
+
+  async installMissingImports(): Promise<void> {
+    const analysis = await this.analyzeCurrentFileImports();
+    if (!analysis || analysis.missingImports.length === 0) {
+      vscode.window.showInformationMessage(
+        "No missing imports detected in the current file"
+      );
+      return;
+    }
+
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders) {
+      vscode.window.showErrorMessage("No workspace folder found!");
+      return;
+    }
+
+    const workspacePath = workspaceFolders[0].uri.fsPath;
+    const config = languageConfigs.find(
+      (c) => c.name.toLowerCase() === analysis.language.toLowerCase()
+    );
+    if (!config) {
+      vscode.window.showErrorMessage(
+        `Language configuration not found for ${analysis.language}`
+      );
+      return;
+    }
+
+    // Ask user which imports to install
+    const selectedImports = await vscode.window.showQuickPick(
+      analysis.missingImports.map((imp) => ({
+        label: imp,
+        picked: true,
+      })),
+      {
+        canPickMany: true,
+        placeHolder: "Select missing imports to install",
+      }
+    );
+
+    if (!selectedImports || selectedImports.length === 0) {
+      return;
+    }
+
+    const importsToInstall = selectedImports.map((item) => item.label);
+    const installedPackages = [];
+
+    // Install each missing import individually
+    for (const importName of importsToInstall) {
+      // For Python, make some package name adjustments
+      const normalizedName = this.normalizeImportName(
+        importName,
+        analysis.language
+      );
+
+      try {
+        await this.installDependency(
+          workspacePath,
+          normalizedName,
+          config.installCommand(normalizedName),
+          config.name
+        );
+
+        installedPackages.push(normalizedName);
+
+        // Add to dependency file if needed (for Python: requirements.txt)
+        if (analysis.language.toLowerCase() === "python") {
+          const primaryFile = path.join(
+            workspacePath,
+            config.getPrimaryDependencyFile()
+          );
+          if (fs.existsSync(primaryFile)) {
+            config.addToDependencyFile(primaryFile, [normalizedName]);
+          }
+        }
+      } catch (error) {
+        vscode.window.showErrorMessage(
+          `Failed to install ${normalizedName}: ${(error as Error).message}`
+        );
+      }
+    }
+
+    vscode.window.showInformationMessage(
+      `Successfully installed ${
+        installedPackages.length
+      } packages: ${installedPackages.join(", ")}`
+    );
+  }
+
+  private extractImportsFromFile(
+    content: string,
+    language: string
+  ): Set<string> {
+    const imports = new Set<string>();
+
+    switch (language.toLowerCase()) {
+      case "javascript":
+      case "typescript":
+      case "nodejs":
+        // Match ES6 imports
+        const es6Matches = [
+          ...content.matchAll(/import\s+.*?from\s+['"]([^'"./][^'"]*)['"]/g),
+        ];
+        for (const match of es6Matches) {
+          const fullImport = match[1];
+          this.addJsImport(imports, fullImport);
+        }
+
+        // Match CommonJS requires separately
+        const cjsMatches = [
+          ...content.matchAll(/require\s*\(\s*['"]([^'"./][^'"]*)['"]\s*\)/g),
+        ];
+        for (const match of cjsMatches) {
+          const fullImport = match[1];
+          this.addJsImport(imports, fullImport);
+        }
+        break;
+
+      case "python":
+        const importLines = content.match(/^\s*import\s+(.+?)($|\n)/gm) || [];
+        for (const line of importLines) {
+          // Split by commas to handle "import x, y, z"
+          const importStatement = line.replace(/^\s*import\s+/, "").trim();
+          const moduleList = importStatement.split(",");
+
+          for (const module of moduleList) {
+            // Extract just the module name without "as" or additional parts
+            const moduleName = module.trim().split(/\s+/)[0].split(".")[0];
+            if (moduleName && !this.isPythonStandardLib(moduleName)) {
+              imports.add(moduleName);
+            }
+          }
+        }
+
+        // Process "from x import y" statements
+        const fromImportLines =
+          content.match(/^\s*from\s+(.+?)\s+import/gm) || [];
+        for (const line of fromImportLines) {
+          const moduleName = line
+            .replace(/^\s*from\s+/, "")
+            .replace(/\s+import.*$/, "")
+            .trim()
+            .split(".")[0];
+
+          if (moduleName && !this.isPythonStandardLib(moduleName)) {
+            imports.add(moduleName);
+          }
+        }
+        break;
+
+      case "php":
+        const phpMatches = [
+          ...content.matchAll(/use\s+([A-Za-z0-9_\\]+)(?:;|\s|as)/g),
+          ...content.matchAll(/require[_once]*\s*\(\s*['"]([^'"]*)['"]\s*\)/g),
+        ];
+
+        for (const match of phpMatches) {
+          // Extract namespace (likely corresponding to a Composer package)
+          const namespace = match[1].split("\\")[0];
+          imports.add(namespace.toLowerCase());
+        }
+        break;
+
+      case "rust":
+        // Match Rust imports
+        const rustMatches = content.matchAll(/^\s*use\s+([a-zA-Z0-9_:]+)/gm);
+
+        for (const match of rustMatches) {
+          const crate = match[1].split("::")[0];
+          if (!this.isRustStandardLib(crate)) {
+            imports.add(crate);
+          }
+        }
+        break;
+
+      case "go":
+        const goBlocks = content.match(/import\s+\(\s*([\s\S]*?)\s*\)/g) || [];
+        for (const block of goBlocks) {
+          const importLines = block.match(/"([^"]+)"/g) || [];
+          for (const imp of importLines) {
+            this.addGoImport(imports, imp.replace(/"/g, ""));
+          }
+        }
+
+        // Match Go imports - single line style
+        const goSingleMatches = content.matchAll(/import\s+"([^"]+)"/g);
+        for (const match of goSingleMatches) {
+          this.addGoImport(imports, match[1]);
+        }
+        break;
+    }
+
+    return imports;
+  }
+
+  private addJsImport(imports: Set<string>, fullImport: string): void {
+    if (!fullImport || fullImport.startsWith(".")) return;
+
+    // Handle scoped packages (@org/package)
+    if (fullImport.startsWith("@")) {
+      const parts = fullImport.split("/");
+      if (parts.length >= 2) {
+        imports.add(`${parts[0]}/${parts[1]}`);
+      }
+    } else {
+      // Regular packages - just take the first part before any '/'
+      const packageName = fullImport.split("/")[0];
+      imports.add(packageName);
+    }
+  }
+
+  private addGoImport(imports: Set<string>, importPath: string): void {
+    if (!importPath) return;
+
+    // Skip standard library
+    if (
+      !importPath.includes(".") ||
+      (!importPath.startsWith("github.com") &&
+        !importPath.startsWith("gitlab.com") &&
+        !importPath.startsWith("golang.org"))
+    ) {
+      return;
+    }
+
+    const parts = importPath.split("/");
+    if (parts.length >= 3) {
+      imports.add(`${parts[0]}/${parts[1]}/${parts[2]}`);
+    }
+  }
+
+  private getLanguageFromExtension(extension: string): string | null {
+    switch (extension) {
+      case ".js":
+      case ".jsx":
+      case ".ts":
+      case ".tsx":
+        return "JavaScript";
+      case ".py":
+        return "Python";
+      case ".php":
+        return "PHP";
+      case ".rs":
+        return "Rust";
+      case ".go":
+        return "Go";
+      default:
+        return null;
+    }
+  }
+
+  private isPythonStandardLib(moduleName: string): boolean {
+    const stdLibModules = new Set([
+      "abc", "aifc", "argparse", "array", "ast", "asynchat", "asyncio", "asyncore",
+      "atexit", "audioop", "base64", "bdb", "binascii", "binhex", "bisect", "builtins",
+      "bz2", "cProfile", "calendar", "cgi", "cgitb", "chunk", "cmath", "cmd", "code",
+      "codecs", "codeop", "collections", "colorsys", "compileall", "concurrent",
+      "configparser", "contextlib", "contextvars", "copy", "copyreg", "crypt", "csv",
+      "ctypes", "curses", "dataclasses", "datetime", "dbm", "decimal", "difflib",
+      "dis", "distutils", "doctest", "email", "encodings", "ensurepip", "enum",
+      "errno", "faulthandler", "fcntl", "filecmp", "fileinput", "fnmatch", "fractions",
+      "ftplib", "functools", "gc", "getopt", "getpass", "gettext", "glob", "graphlib",
+      "gzip", "hashlib", "heapq", "hmac", "html", "http", "imaplib", "imghdr",
+      "importlib", "inspect", "io", "ipaddress", "itertools", "json", "keyword",
+      "lib2to3", "linecache", "locale", "logging", "lzma", "mailbox", "mailcap",
+      "marshal", "math", "mimetypes", "mmap", "modulefinder", "msilib", "multiprocessing",
+      "netrc", "nntplib", "numbers", "operator", "optparse", "os", "ossaudiodev",
+      "parser", "pathlib", "pdb", "pickle", "pickletools", "pipes", "pkgutil", "platform",
+      "plistlib", "poplib", "posix", "pprint", "profile", "pstats", "pty", "pwd",
+      "py_compile", "pyclbr", "pydoc", "queue", "quopri", "random", "re", "readline",
+      "reprlib", "resource", "rlcompleter", "runpy", "sched", "secrets", "select",
+      "selectors", "shelve", "shlex", "shutil", "signal", "site", "smtpd", "smtplib",
+      "sndhdr", "socket", "socketserver", "spwd", "sqlite3", "ssl", "stat", "statistics",
+      "string", "stringprep", "struct", "subprocess", "sunau", "symtable", "sys",
+      "sysconfig", "syslog", "tabnanny", "tarfile", "telnetlib", "tempfile", "termios",
+      "textwrap", "threading", "time", "timeit", "tkinter", "token", "tokenize",
+      "trace", "traceback", "tracemalloc", "tty", "turtle", "turtledemo", "types",
+      "typing", "unicodedata", "unittest", "urllib", "uuid", "venv", "warnings",
+      "wave", "weakref", "webbrowser", "winreg", "winsound", "wsgiref", "xdrlib",
+      "xml", "xmlrpc", "zipapp", "zipfile", "zipimport", "zlib"
+    ]);
+    return stdLibModules.has(moduleName);
+  }
+  
+
+  private isRustStandardLib(crateName: string): boolean {
+    const stdLibCrates = new Set([
+      "std",           // Standard library
+      "core",          // Core functionalities without OS features
+      "alloc",         // Heap allocation APIs
+      "proc_macro",    // Compiler plugins/macros
+      "test",          // Rust's internal test harness
+      "panic_unwind",  // Panic handling
+      "panic_abort",   // Panic handler
+      "unwind",        // Exception handling
+      "term",          // Terminal color APIs (part of std)
+      "getopts",       // Command line argument parsing (was in std, now deprecated)
+      "hashbrown",     // Used internally for hash maps
+      "rustc_std_workspace_core",
+      "rustc_std_workspace_alloc",
+      "rustc_std_workspace_std",
+      "self"           // Special keyword in Rust
+    ]);
+    return stdLibCrates.has(crateName);
+  }
+
+  private normalizeImportName(importName: string, language: string): string {
+    switch (language.toLowerCase()) {
+      case 'python':
+        // Handle common Python package name mappings
+        const pythonPackageMap: Record<string, string> = {
+          'pil': 'pillow',
+          'cv2': 'opencv-python',
+          'sklearn': 'scikit-learn',
+        };
+        
+        const baseName = importName.toLowerCase();
+        return pythonPackageMap[baseName] || baseName.replace(/_/g, '-');
+      case "rust":
+        // Rust crate names usually use hyphens instead of underscores
+        return importName.replace(/_/g, "-");
+      default:
+        return importName;
     }
   }
 }
@@ -1702,7 +2145,11 @@ async function updateDiagnostics(
   versionDiagnostics.set(document.uri, diagnostics);
 }
 
-function generateHtml(analysisMap: Map<string, DependencyAnalysis>, depTrees: Map<string, Map<string, DependencyNode>>, analyzer: DependencyAnalyzer): string {
+function generateHtml(
+  analysisMap: Map<string, DependencyAnalysis>,
+  depTrees: Map<string, Map<string, DependencyNode>>,
+  analyzer: DependencyAnalyzer
+): string {
   return `
         <!DOCTYPE html>
         <html>
@@ -1964,7 +2411,7 @@ function generateNestedTree(node: DependencyNode, level: number = 1): string {
       <div class="tree-node-children">
         ${Array.from(node.dependencies.entries())
           .map(([name, dep]) => generateNestedTree(dep, (level % 5) + 1))
-          .join('')}
+          .join("")}
       </div>
     </div>
   `;
@@ -2043,7 +2490,9 @@ function generateVulnerabilityHtml(
     `;
 }
 
-function generateHtmlWithoutTrees(analysisMap: Map<string, DependencyAnalysis>): string {
+function generateHtmlWithoutTrees(
+  analysisMap: Map<string, DependencyAnalysis>
+): string {
   return `
         <!DOCTYPE html>
         <html>
@@ -2184,7 +2633,6 @@ function generateHtmlWithoutTrees(analysisMap: Map<string, DependencyAnalysis>):
     `;
 }
 
-
 export function activate(context: vscode.ExtensionContext) {
   console.log("Depramanger extension is now active!");
 
@@ -2215,16 +2663,25 @@ export function activate(context: vscode.ExtensionContext) {
             const depTrees = new Map<string, Map<string, DependencyNode>>();
             for (const config of languageConfigs) {
               try {
-                const analysis = await analyzer.analyzeLanguageDependencies(folderPath, config);
+                const analysis = await analyzer.analyzeLanguageDependencies(
+                  folderPath,
+                  config
+                );
                 if (analysis) {
                   analysisMap.set(config.name, analysis);
-                  
+
                   // Build dependency trees
-                  const trees = await analyzer.analyzeDependencyTree(folderPath, config);
+                  const trees = await analyzer.analyzeDependencyTree(
+                    folderPath,
+                    config
+                  );
                   depTrees.set(config.name, trees);
                 }
               } catch (error) {
-                console.error(`Error analyzing ${config.name} dependencies:`, error);
+                console.error(
+                  `Error analyzing ${config.name} dependencies:`,
+                  error
+                );
               }
             }
 
@@ -2240,7 +2697,11 @@ export function activate(context: vscode.ExtensionContext) {
                 { enableScripts: true }
               );
 
-              currentPanel.webview.html = generateHtml(analysisMap, depTrees, analyzer);
+              currentPanel.webview.html = generateHtml(
+                analysisMap,
+                depTrees,
+                analyzer
+              );
 
               currentPanel.onDidDispose(() => {
                 currentPanel = undefined;
@@ -2374,15 +2835,15 @@ export function activate(context: vscode.ExtensionContext) {
           vscode.window.showErrorMessage("No workspace folder found!");
           return;
         }
-  
+
         const folderPath = workspaceFolders[0].uri.fsPath;
         const analyzer = new DependencyAnalyzer();
-  
+
         await analyzer.uninstallSpecificDependency(folderPath);
       }
     )
   );
-  
+
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "dependencyChecker.scanVulnerabilities",
@@ -2463,6 +2924,28 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidCloseTextDocument((document) => {
       versionDiagnostics.delete(document.uri);
     })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "dependencyChecker.checkCurrentFileImports",
+      async () => {
+        const analyzer = new DependencyAnalyzer();
+        const analysis = await analyzer.analyzeCurrentFileImports();
+
+        if (!analysis) {
+          return;
+        }
+
+        if (analysis.missingImports.length === 0) {
+          vscode.window.showInformationMessage(
+            `All ${analysis.detectedImports.size} imports are already installed.`
+          );
+          return;
+        }
+        await analyzer.installMissingImports();
+      }
+    )
   );
 }
 
