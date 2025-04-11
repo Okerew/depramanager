@@ -17,6 +17,8 @@ The Depramanger is a Visual Studio Code (VSCode) extension designed to help deve
 - **Highlights outdated dependencies** Highlights outdated dependencies in the editor in the configuration file of the given language.
 - **Scans for vulnerabilities** Scans for vulnerabilities in the dependencies of your project.
 
+- **Installs dependencies from a specified file** Installs dependencies defined in the file opened in VSCode.
+
 ## Supported Languages
 
 - Python
@@ -105,6 +107,14 @@ The extension provides several commands that can be accessed through the Command
   2. Type `Depramanger: Uninstall Dependencies` and select it.
   3. Follow the prompts to select the programming language and enter the dependency name.
 
+#### 8. Check Current File Imports
+- **Command**: `Depramanager: checkCurrentFileImports`
+- **Description**: Checks the current file for imports and installs missing dependencies.
+- **Usage**:
+  1. Open the Command Palette (`Ctrl+Shift+P`).
+  2. Type `Depramanger: Check Current File Imports` and select it.
+  3. The extension will check the current file for imports and install missing dependencies.
+
 ## Configuration
 
 The extension uses predefined configurations for each supported language. These configurations include:
@@ -118,6 +128,20 @@ The extension uses predefined configurations for each supported language. These 
 - **Primary Dependency File**: The main file where dependencies are declared.
 - **Version Check**: Functions to get the current and latest versions of a dependency.
 - **Update Dependency**: Function to update a dependency in the primary dependency file.
+
+## Compilation
+
+To compile the extension, run the following command in the terminal:
+
+```sh
+vsce package
+```
+
+Then to install the extension, run the following command in the terminal:
+
+```sh
+code --install-extension depramanager-1.1.0.vsix
+```
 
 ## Contributing
 
