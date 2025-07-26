@@ -150,3 +150,7 @@ Contributions are welcome! If you find any issues or have suggestions for improv
 ## License
 
 This extension is licensed under the Apache 2 License. See the LICENSE file for more information.
+
+## Notes
+
+You can see also a nvim port i created here https://github.com/Okerew/OkerewConfig.
