@@ -7,6 +7,10 @@ Showcase:
 
 The Depramanger is a Visual Studio Code (VSCode) extension designed to help developers manage dependencies for various programming languages. It provides functionalities to analyze, sync, update, and install dependencies, ensuring that your project's dependencies are up-to-date and correctly declared.
 
+## Neovim port
+
+<a href="https://github.com/Okerew/depramanager-nvim">Github page</a> 
+
 ## Features
 
 - **Dependency Analysis**: Scans your workspace to identify declared, installed, missing, and extra dependencies, also depedency trees.
@@ -150,7 +154,3 @@ Contributions are welcome! If you find any issues or have suggestions for improv
 ## License
 
 This extension is licensed under the Apache 2 License. See the LICENSE file for more information.
-
-## Notes
-
-You can see also a nvim port i created here https://github.com/Okerew/OkerewConfig.
