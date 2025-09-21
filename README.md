@@ -1,6 +1,14 @@
 # Depramanager Documentation
 
-Showcase:
+
+## Deprecated
+Why did I deprecate this?
+
+I found that this plugin is quite pointless for my workflow as I don't really update depedencies.
+
+Further more I no longer use vscode
+
+## Showcase:
 <a href="https://youtu.be/gHTd4CFbHas"><img src="https://cdn.glitch.global/a876511c-32af-4497-ae48-bc7d305558bb/icon.png?v=1739468743961"></a>
 
 ## Overview
